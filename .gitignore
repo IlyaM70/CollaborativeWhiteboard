@@ -20,8 +20,6 @@ WhiteboardApi/obj/
 *.user
 *.rsuser
 *.sln.docstates
-appsettings.Development.json
-appsettings.json
 
 # --- Editor (VS Code only) ---
 .vs/
