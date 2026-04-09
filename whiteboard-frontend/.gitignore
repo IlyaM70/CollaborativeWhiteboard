@@ -15,8 +15,8 @@ dist-ssr/
 .env.*
 
 # --- .NET ---
-bin/
-obj/
+WhiteboardApi/bin/
+WhiteboardApi/obj/
 *.user
 *.rsuser
 *.sln.docstates
