@@ -1,0 +1,31 @@
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# --- Node / Frontend ---
+node_modules/
+dist/
+dist-ssr/
+
+# --- Environment ---
+.env
+.env.*
+
+# --- .NET ---
+bin/
+obj/
+*.user
+*.rsuser
+*.sln.docstates
+
+# --- Editor (VS Code only) ---
+.vs/
+.vscode/*
+!.vscode/extensions.json
+
+# --- OS ---
+.DS_Store
+Thumbs.db
