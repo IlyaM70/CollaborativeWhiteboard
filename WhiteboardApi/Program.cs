@@ -1,25 +1,55 @@
+using Microsoft.OpenApi.Models;
+using WhiteboardApi;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// SignalR
+builder.Services.AddSignalR();
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+	c.SwaggerDoc("v1", new OpenApiInfo
+	{
+		Title = "Whiteboard API",
+		Version = "v1"
+	});
+});
+
+// CORS (React Vite)
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("client", policy =>
+	{
+		policy
+			.WithOrigins("http://localhost:5173")
+			.AllowAnyHeader()
+			.AllowAnyMethod()
+			.AllowCredentials();
+	});
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Dev tooling
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("client");
 
-app.UseAuthorization();
+app.UseRouting();
 
+// SignalR hub
+app.MapHub<WhiteboardHub>("/whiteboardHub");
+
+// controllers
 app.MapControllers();
 
 app.Run();
