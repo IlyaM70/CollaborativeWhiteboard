@@ -1,7 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { connection } from "../socket";
+import CanvasBoard from "./CanvasBoard";
 
 export default function BoardPage({ roomId = "test-room" }) {
+
+  const [receivedDrawing, setReceivedDrawing] = useState(null);
+
   useEffect(() => {
     async function start() {
       try {
@@ -14,20 +18,10 @@ export default function BoardPage({ roomId = "test-room" }) {
 
         connection.on("ReceiveDrawing", (drawingEvent) => {
           console.log("Received drawing:", drawingEvent);
+          setReceivedDrawing(drawingEvent);
         });
 
-        await connection.invoke("JoinRoom", roomId);
-
-        await connection.invoke("SendDrawing", roomId, {
-          type: "stroke",
-          points: [
-            { x: 10, y: 20 },
-            { x: 20, y: 30 },
-            { x: 30, y: 40 }
-          ],
-          color: "black",
-          thickness: 2
-        });
+        await connection.invoke("JoinRoom", roomId);     
 
         
       } catch (err) {
@@ -38,5 +32,15 @@ export default function BoardPage({ roomId = "test-room" }) {
     start();
   }, [roomId]);
 
-  return <div>Connected (check console)</div>;
+  function onDrawingComplete(drawingEvent) {
+    console.log("Sending drawing event:", drawingEvent);
+    connection.invoke("SendDrawing", roomId, drawingEvent);
+  }
+
+    return (
+    <div>
+      <h1>Whiteboard</h1>
+      <CanvasBoard onDrawingComplete={onDrawingComplete} receivedDrawing={receivedDrawing} />
+    </div>
+  );
 }
