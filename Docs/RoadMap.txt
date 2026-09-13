@@ -2,7 +2,7 @@ LEVEL 1 — Software Development
 ├── MVP
 │   ├── Core drawing ✓
 │   ├── Real-time sync ✓
-│   ├── Room handling
+│   ├── Room handling ✓
 │   ├── Basic UX / remaining MVP behavior
 │   └── Cleanup / refactoring
 │

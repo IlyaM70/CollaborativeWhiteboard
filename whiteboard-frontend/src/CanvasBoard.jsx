@@ -1,9 +1,12 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
   const points = useRef([]);
+
+  const [color, setColor] = useState("black");
+  const [thickness, setThickness] = useState(2);
 
   useEffect(() => {
     if (!receivedDrawing || !receivedDrawing.points || receivedDrawing.points.length === 0) {
@@ -57,6 +60,8 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
     points.current.push(point);
 
     context.lineTo(point.x, point.y);
+    context.strokeStyle = color;
+    context.lineWidth = thickness;
     context.stroke();
   }
 
@@ -68,8 +73,8 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
         const drawingEvent = {
         type: "stroke",
         points: points.current,
-        color: "black",
-        thickness: 2,
+        color: color,
+        thickness: thickness,
         };
 
         console.log("Drawing complete:", drawingEvent);
@@ -81,6 +86,28 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
   }
 
   return (
+    <>
+    <div style={{ marginBottom: "20px" }}>
+      <label>
+        Color:
+        <input
+          type="color"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+        />
+      </label>
+      <label>
+        Thickness:
+        <input
+          type="range"
+          min="1"
+          max="10"
+          value={thickness}
+          onChange={(e) => setThickness(parseInt(e.target.value))}
+        />
+      </label>
+    </div>
+
     <canvas
       ref={canvasRef}
       width={800}
@@ -91,5 +118,6 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     />
+    </>
   );
 }
