@@ -1,0 +1,25 @@
+LEVEL 1 — Software Development
+├── MVP
+│   ├── Core drawing ✓
+│   ├── Real-time sync ✓
+│   ├── Room handling
+│   ├── Basic UX / remaining MVP behavior
+│   └── Cleanup / refactoring
+│
+LEVEL 2 — Quality Engineering
+├── Unit tests
+├── Integration tests
+└── Playwright
+│
+LEVEL 3 — Engineering Operations
+├── CI/CD
+├── Docker
+├── Deployment
+└── Logging
+│
+LEVEL 4 — Advanced Engineering
+├── Reconnection
+├── Failure handling
+├── Concurrency
+├── Idempotency
+└── etc.

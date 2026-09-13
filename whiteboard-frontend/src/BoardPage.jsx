@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { connection } from "../socket";
 import CanvasBoard from "./CanvasBoard";
 
-export default function BoardPage({ roomId = "test-room" }) {
+export default function BoardPage() {
 
+  const {roomId} = useParams();
   const [receivedDrawing, setReceivedDrawing] = useState(null);
 
   useEffect(() => {
