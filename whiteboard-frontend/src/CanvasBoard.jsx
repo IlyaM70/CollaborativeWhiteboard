@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 
-export default function CanvasBoard({ onDrawingComplete, receivedDrawing, onClearCanvas, receivedClear }) {
+export default function CanvasBoard({ roomId, onDrawingComplete, receivedDrawing, onClearCanvas, receivedClear }) {
 
   // Refs to manage canvas and drawing state
   const canvasRef = useRef(null);
@@ -51,6 +51,10 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing, onClea
     clearCanvas();
     onClearCanvas(); // Notify parent component to send clear event to other users
   }
+
+  useEffect(() => {
+    clearCanvas();
+  }, [roomId]);
 
 ////////////////////////////////////////////////////////
   function getPoint(event) {

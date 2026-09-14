@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { connection } from "../socket";
 import CanvasBoard from "./CanvasBoard";
+import { useNavigate } from "react-router-dom";
 
 export default function BoardPage() {
 
@@ -71,11 +72,29 @@ export default function BoardPage() {
     connection.invoke("ClearBoard", roomId);
   }
 
+  const navigate = useNavigate();
+  const [newRoomId, setNewRoomId] = useState("");
+  function handleRoomChange() {
+    if (newRoomId.trim() == "") return;
+
+    navigate(`/board/${newRoomId}`);
+  }
+
+
     return (
     <>
       <h1>Whiteboard</h1>
       <div>{connectionState}</div>
-      <CanvasBoard onDrawingComplete={onDrawingComplete}
+      <div>This is the room: {roomId}</div>
+      <div>Connnected users: </div>
+      <label>
+        If you want to change the room, type a new room ID and press the button. This will create a new room if it doesn't exist.
+        <input type="text" value={newRoomId} onChange={(e) => setNewRoomId(e.target.value)} />
+        <button onClick = {handleRoomChange}>Change room</button>
+      </label>
+      <CanvasBoard
+       roomId={roomId}
+       onDrawingComplete={onDrawingComplete}
        receivedDrawing={receivedDrawing}
        onClearCanvas={onClearCanvas}
        receivedClear={receivedClear} />
