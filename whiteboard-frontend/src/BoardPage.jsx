@@ -6,13 +6,35 @@ import CanvasBoard from "./CanvasBoard";
 export default function BoardPage() {
 
   const {roomId} = useParams();
-  const [receivedDrawing, setReceivedDrawing] = useState(null);
 
+  const [receivedDrawing, setReceivedDrawing] = useState(null);
+  const [receivedClear, setReceivedClear] = useState(0);
+  const [connectionState, setConnectionState] = useState(connection.state);
+
+
+  // Effect to handle SignalR connection and events
   useEffect(() => {
     async function start() {
       try {
         await connection.start();
         console.log("Connected to SignalR");
+
+        setConnectionState(connection.state);
+
+        connection.onreconnecting(() => {
+          setConnectionState(connection.state);
+          console.log("Connection state changed:", connection.state);
+        });
+
+        connection.onreconnected(() => {
+          setConnectionState(connection.state);
+          console.log("Connection state changed:", connection.state);
+        });
+
+        connection.onclose(() => {
+          setConnectionState(connection.state);
+          console.log("Connection state changed:", connection.state);
+        });
 
         connection.on("JoinedRoom", (room) => {
           console.log("Joined room:", room);
@@ -21,6 +43,11 @@ export default function BoardPage() {
         connection.on("ReceiveDrawing", (drawingEvent) => {
           console.log("Received drawing:", drawingEvent);
           setReceivedDrawing(drawingEvent);
+        });
+
+        connection.on("ReceiveClear", () => {
+          console.log("Received clear event");
+          setReceivedClear((prev) => prev + 1);
         });
 
         await connection.invoke("JoinRoom", roomId);     
@@ -39,10 +66,19 @@ export default function BoardPage() {
     connection.invoke("SendDrawing", roomId, drawingEvent);
   }
 
+  function onClearCanvas() {
+    console.log("Sending clear event");
+    connection.invoke("ClearBoard", roomId);
+  }
+
     return (
-    <div>
+    <>
       <h1>Whiteboard</h1>
-      <CanvasBoard onDrawingComplete={onDrawingComplete} receivedDrawing={receivedDrawing} />
-    </div>
+      <div>{connectionState}</div>
+      <CanvasBoard onDrawingComplete={onDrawingComplete}
+       receivedDrawing={receivedDrawing}
+       onClearCanvas={onClearCanvas}
+       receivedClear={receivedClear} />
+    </>
   );
 }

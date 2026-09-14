@@ -1,14 +1,19 @@
 import { useRef, useEffect, useState } from "react";
 
-export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
+export default function CanvasBoard({ onDrawingComplete, receivedDrawing, onClearCanvas, receivedClear }) {
+
+  // Refs to manage canvas and drawing state
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
   const points = useRef([]);
 
+  // State for color and thickness
   const [color, setColor] = useState("black");
   const [thickness, setThickness] = useState(2);
 
+  // Effect to handle drawing received from other users
   useEffect(() => {
+    // Do not draw if receivedDrawing is null or has no points
     if (!receivedDrawing || !receivedDrawing.points || receivedDrawing.points.length === 0) {
         return;
     }
@@ -27,6 +32,27 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
     
   }, [receivedDrawing]);
 
+
+//Everything to do with clearing the canvas
+
+  function clearCanvas() {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  // Effect to handle clear event received from other users
+  useEffect(() => {
+    if (receivedClear) {
+      clearCanvas();
+    }
+  }, [receivedClear]);
+
+  function handleClearCanvas() {
+    clearCanvas();
+    onClearCanvas(); // Notify parent component to send clear event to other users
+  }
+
+////////////////////////////////////////////////////////
   function getPoint(event) {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -85,6 +111,8 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
 
   }
 
+
+
   return (
     <>
     <div style={{ marginBottom: "20px" }}>
@@ -106,6 +134,9 @@ export default function CanvasBoard({ onDrawingComplete, receivedDrawing }) {
           onChange={(e) => setThickness(parseInt(e.target.value))}
         />
       </label>
+      <button style={{color: "white", backgroundColor: "red"}} onClick={handleClearCanvas}>
+        Clear
+      </button>
     </div>
 
     <canvas

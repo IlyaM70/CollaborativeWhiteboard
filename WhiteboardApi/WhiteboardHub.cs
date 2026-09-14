@@ -14,5 +14,10 @@ namespace WhiteboardApi
 		{
 			await Clients.Group(roomId).SendAsync("ReceiveDrawing", drawingEvent);
 		}
+
+		public async Task ClearBoard(string roomId)
+		{
+			await Clients.Group(roomId).SendAsync("ReceiveClear", true);
+		}
 	}
 }
