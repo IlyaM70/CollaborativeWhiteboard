@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { connection } from "../socket";
 import CanvasBoard from "./CanvasBoard";
-import { useNavigate } from "react-router-dom";
 
 export default function BoardPage() {
 
   const {roomId} = useParams();
-
+  const navigate = useNavigate();
+  
   const [receivedDrawing, setReceivedDrawing] = useState(null);
   const [receivedClear, setReceivedClear] = useState(0);
   const [connectionState, setConnectionState] = useState(connection.state);
+  const [newRoomId, setNewRoomId] = useState("");
 
 
   // Effect to handle SignalR connection and events
@@ -18,40 +19,30 @@ export default function BoardPage() {
     async function start() {
       try {
         await connection.start();
-        console.log("Connected to SignalR");
 
         setConnectionState(connection.state);
 
         connection.onreconnecting(() => {
-          setConnectionState(connection.state);
-          console.log("Connection state changed:", connection.state);
+          setConnectionState(connection.state);          
         });
 
         connection.onreconnected(() => {
           setConnectionState(connection.state);
-          console.log("Connection state changed:", connection.state);
         });
 
         connection.onclose(() => {
           setConnectionState(connection.state);
-          console.log("Connection state changed:", connection.state);
         });
 
-        connection.on("JoinedRoom", (room) => {
-          console.log("Joined room:", room);
-        });
-
-        connection.on("ReceiveDrawing", (drawingEvent) => {
-          console.log("Received drawing:", drawingEvent);
+        connection.on("ReceiveDrawing", (drawingEvent) => {          
           setReceivedDrawing(drawingEvent);
         });
 
-        connection.on("ReceiveClear", () => {
-          console.log("Received clear event");
+        connection.on("ReceiveClear", () => {          
           setReceivedClear((prev) => prev + 1);
         });
 
-        await connection.invoke("JoinRoom", roomId);     
+        await connection.invoke("JoinRoom", roomId);   
 
         
       } catch (err) {
@@ -62,18 +53,16 @@ export default function BoardPage() {
     start();
   }, [roomId]);
 
-  function onDrawingComplete(drawingEvent) {
-    console.log("Sending drawing event:", drawingEvent);
+  ///////////////////
+
+  function onDrawingComplete(drawingEvent) {    
     connection.invoke("SendDrawing", roomId, drawingEvent);
   }
 
-  function onClearCanvas() {
-    console.log("Sending clear event");
+  function onClearCanvas() {    
     connection.invoke("ClearBoard", roomId);
   }
 
-  const navigate = useNavigate();
-  const [newRoomId, setNewRoomId] = useState("");
   function handleRoomChange() {
     if (newRoomId.trim() == "") return;
 

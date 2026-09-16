@@ -3,7 +3,7 @@ LEVEL 1 — Software Development
 │   ├── Core drawing ✓
 │   ├── Real-time sync ✓
 │   ├── Room handling ✓
-│   ├── Basic UX / remaining MVP behavior
+│   ├── Basic UX / remaining MVP behavior ✓
 │   └── Cleanup / refactoring
 │
 LEVEL 2 — Quality Engineering

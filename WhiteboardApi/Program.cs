@@ -3,10 +3,7 @@ using WhiteboardApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
 builder.Services.AddControllers();
-
-// SignalR
 builder.Services.AddSignalR();
 
 // Swagger
@@ -20,7 +17,7 @@ builder.Services.AddSwaggerGen(c =>
 	});
 });
 
-// CORS (React Vite)
+// Allow the React client to communicate with the ASP.NET Core backend.
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("client", policy =>
@@ -35,7 +32,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Dev tooling
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
@@ -44,12 +40,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("client");
 
-app.UseRouting();
-
-// SignalR hub
 app.MapHub<WhiteboardHub>("/whiteboardHub");
 
-// controllers
 app.MapControllers();
 
 app.Run();
