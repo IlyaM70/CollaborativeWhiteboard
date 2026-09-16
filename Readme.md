@@ -11,6 +11,7 @@ Real-time sync (WebSocket)
 Room via URL (/board/:roomId)
 
 Excluded
+
 Auth
 Persistence
 Undo/redo
