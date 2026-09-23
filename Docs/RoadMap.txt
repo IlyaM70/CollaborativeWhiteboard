@@ -4,7 +4,7 @@ LEVEL 1 — Software Development
 │   ├── Real-time sync ✓
 │   ├── Room handling ✓
 │   ├── Basic UX / remaining MVP behavior ✓
-│   └── Cleanup / refactoring
+│   └── Cleanup / refactoring ✓
 │
 LEVEL 2 — Quality Engineering
 ├── Unit tests
@@ -17,7 +17,14 @@ LEVEL 3 — Engineering Operations
 ├── Deployment
 └── Logging
 │
+
+LEVEL 3.5 - Advanced Feautures
+ -  Auth & guests 
+ - Reprsistance
+ - Permisions
+
 LEVEL 4 — Advanced Engineering
+
 ├── Reconnection
 ├── Failure handling
 ├── Concurrency
