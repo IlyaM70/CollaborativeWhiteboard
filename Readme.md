@@ -9,10 +9,10 @@ Single board per room
 Canvas drawing (mouse only)
 Real-time sync (WebSocket)
 Room via URL (/board/:roomId)
-Random username (no auth)
 
 Excluded
 
+Auth
 Persistence
 Undo/redo
 Tools (only pen)
@@ -27,8 +27,36 @@ DrawingEvent {
   thickness: number
 }
 
-Events
+Backend
+
+The backend is an ASP.NET Core application using SignalR for real-time
+communication between users in the same whiteboard room.
+
+SignalR API
+
+Client → Server
 
 JoinRoom(roomId)
+    Adds the current connection to the specified room.
+
+SendDrawing(roomId, drawingEvent)
+    Broadcasts a drawing event to all users in the room.
+
+ClearBoard(roomId)
+    Broadcasts a clear event to all users in the room.
+
+Server → Client
+
+JoinedRoom(roomId)
+    Confirms that the client joined the room.
+
 ReceiveDrawing(drawingEvent)
-SendDrawing(drawingEvent)
+    Delivers a drawing event from the room.
+
+ReceiveClear()
+    Tells clients to clear their canvas.
+
+Persistence
+
+The MVP does not use a database. Drawings exist only on the clients'
+HTML canvas and are not restored when a user joins or refreshes the page.
