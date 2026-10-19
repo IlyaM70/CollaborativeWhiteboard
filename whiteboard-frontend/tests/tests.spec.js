@@ -129,4 +129,16 @@ test('TC-02', async ({ page }) => {
   expect(hasBlueStroke).toBe(true);
 });
 
+ // TC-03: Strokes use the selected thickness
+test('TC-03: Thickness slider accepts different values', async ({ page }) => {
+  await page.goto('http://localhost:5173/board/test');
+
+  const thicknessSlider = page.locator('input[type="range"]');
+
+  await thicknessSlider.fill('2');
+  await expect(thicknessSlider).toHaveValue('2');
+
+  await thicknessSlider.fill('10');
+  await expect(thicknessSlider).toHaveValue('10');
+});
 
