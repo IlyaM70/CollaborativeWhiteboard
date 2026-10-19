@@ -302,3 +302,51 @@ test('TC-06', async ({ page }) => {
 
   expect(isCanvasCleared).toBe(true);
 });
+
+
+//TC-07: Clear is synchronized within a room
+test('TC-07', async ({ browser }) => {
+  const pageA = await browser.newPage();
+  const pageB = await browser.newPage();
+
+  // Open the same room
+  await pageA.goto('http://localhost:5173/board/test');
+  await pageB.goto('http://localhost:5173/board/test');
+
+  // User A draws a stroke
+  const canvasA = pageA.locator('canvas');
+  const boxA = await canvasA.boundingBox();
+
+  await pageA.mouse.move(boxA.x + 50, boxA.y + 50);
+  await pageA.mouse.down();
+  await pageA.mouse.move(boxA.x + 150, boxA.y + 150);
+  await pageA.mouse.up();
+
+  // Click the clear button in User A's view
+  const clearButton = pageA.locator('button:has-text("Clear")');
+  await clearButton.click();
+
+  // Allow time for synchronization
+  await pageB.waitForTimeout(1000);
+
+  // Verify that User B's canvas is also cleared
+  const isCanvasClearedB = await pageB.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i + 3] > 0) {
+        return false; // Found a non-transparent pixel
+      }
+    }
+
+    return true; // All pixels are transparent
+  });
+
+  expect(isCanvasClearedB).toBe(true);
+
+  await pageA.close();
+  await pageB.close();
+});
