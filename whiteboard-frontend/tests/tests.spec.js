@@ -266,7 +266,6 @@ test('TC-05', async ({ browser }) => {
   await pageB.close();
 });
 
-
 // TC-06: User can clear their canvas
 test('TC-06', async ({ page }) => {
   await page.goto('http://localhost:5173/board/test');
@@ -302,7 +301,6 @@ test('TC-06', async ({ page }) => {
 
   expect(isCanvasCleared).toBe(true);
 });
-
 
 //TC-07: Clear is synchronized within a room
 test('TC-07', async ({ browser }) => {
@@ -346,6 +344,65 @@ test('TC-07', async ({ browser }) => {
   });
 
   expect(isCanvasClearedB).toBe(true);
+
+  await pageA.close();
+  await pageB.close();
+});
+
+//TC-08: Clear is isolated between rooms
+test('TC-08', async ({ browser }) => {
+  const pageA = await browser.newPage();
+  const pageB = await browser.newPage();
+
+  // Open different rooms
+  await pageA.goto('http://localhost:5173/board/test1');
+  await pageB.goto('http://localhost:5173/board/test2');
+
+  // User A draws a stroke
+  const canvasA = pageA.locator('canvas');
+  const boxA = await canvasA.boundingBox();
+
+  await pageA.mouse.move(boxA.x + 50, boxA.y + 50);
+  await pageA.mouse.down();
+  await pageA.mouse.move(boxA.x + 150, boxA.y + 150);
+  await pageA.mouse.up();
+
+
+  //User B draws a stroke
+  const canvasB = pageB.locator('canvas');
+  const boxB = await canvasB.boundingBox();
+
+  await pageB.mouse.move(boxB.x + 200, boxB.y + 50);
+  await pageB.mouse.down();
+  await pageB.mouse.move(boxB.x + 300, boxB.y + 150);
+  await pageB.mouse.up();
+
+  // Click the clear button in User A's view
+  const clearButton = pageA.locator('button:has-text("Clear")');
+  await clearButton.click();
+
+  // Allow time for synchronization
+  await pageB.waitForTimeout(1000);
+
+
+
+  // Verify that User B's canvas is not cleared
+  const isCanvasClearedB = await pageB.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i + 3] > 0) {
+        return false; // Found a non-transparent pixel
+      }
+    }
+
+    return true; // All pixels are transparent
+  });
+
+  expect(isCanvasClearedB).toBe(false);
 
   await pageA.close();
   await pageB.close();
