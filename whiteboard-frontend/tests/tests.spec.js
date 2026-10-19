@@ -266,3 +266,39 @@ test('TC-05', async ({ browser }) => {
   await pageB.close();
 });
 
+
+// TC-06: User can clear their canvas
+test('TC-06', async ({ page }) => {
+  await page.goto('http://localhost:5173/board/test');
+
+  const canvas = page.locator('canvas');
+  const box = await canvas.boundingBox();
+
+  // Draw a stroke
+  await page.mouse.move(box.x + 50, box.y + 50);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 150, box.y + 150);
+  await page.mouse.up();
+
+  // Click the clear button
+  const clearButton = page.locator('button:has-text("Clear")');
+  await clearButton.click();
+
+  // Verify that the canvas is cleared
+  const isCanvasCleared = await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i + 3] > 0) {
+        return false; // Found a non-transparent pixel
+      }
+    }
+
+    return true; // All pixels are transparent
+  });
+
+  expect(isCanvasCleared).toBe(true);
+});
