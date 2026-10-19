@@ -232,3 +232,52 @@ test('TC-04 ', async ({ browser }) => {
   expect(hasDrawingA).toBe(true);
 
 });
+
+
+
+
+ // TC-05: Drawings are isolated between rooms
+test('TC-05', async ({ browser }) => {
+  const pageA = await browser.newPage();
+  const pageB = await browser.newPage();
+
+  // Open different rooms
+  await pageA.goto('http://localhost:5173/board/test1');
+  await pageB.goto('http://localhost:5173/board/test2');
+
+  // User A draws in room test1
+  const canvasA = pageA.locator('canvas');
+  const boxA = await canvasA.boundingBox();
+
+  await pageA.mouse.move(boxA.x + 50, boxA.y + 50);
+  await pageA.mouse.down();
+  await pageA.mouse.move(boxA.x + 150, boxA.y + 150);
+  await pageA.mouse.up();
+
+  // Allow time for synchronization
+  await pageB.waitForTimeout(1000);
+
+  // Check whether User B received the stroke in the same region
+  const hasDrawingB = await pageB.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const image = ctx.getImageData(40, 40, 120, 120);
+    const pixels = image.data;
+
+    // Ignore transparent pixels; only detect visible pixels
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i + 3] > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+  
+  // User B should not see User A's stroke
+  expect(hasDrawingB).toBe(false);
+
+  await pageA.close();
+  await pageB.close();
+});
+
