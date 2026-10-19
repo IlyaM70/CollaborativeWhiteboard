@@ -29,11 +29,7 @@ test('TC-01', async ({ page }) => {
 
   const pixels = imageData.data;
   for (let i = 0; i < pixels.length; i += 4) {
-      if (
-          pixels[i] !== 255 ||
-          pixels[i + 1] !== 255 ||
-          pixels[i + 2] !== 255
-      ) {
+      if (pixels[i + 3] > 0) {
           return true;
       }
   }
@@ -176,11 +172,7 @@ test('TC-04 ', async ({ browser }) => {
 
     const pixels = imageData.data;
     for (let i = 0; i < pixels.length; i += 4) {
-      if (
-        pixels[i] !== 255 ||
-        pixels[i + 1] !== 255 ||
-        pixels[i + 2] !== 255
-      ) {
+      if (pixels[i + 3] > 0) {
         return true;
       }
     }
@@ -217,11 +209,7 @@ test('TC-04 ', async ({ browser }) => {
 
     const pixels = imageData.data;
     for (let i = 0; i < pixels.length; i += 4) {
-      if (
-        pixels[i] !== 255 ||
-        pixels[i + 1] !== 255 ||
-        pixels[i + 2] !== 255
-      ) {
+      if (pixels[i + 3] > 0) {
         return true;
       }
     }
@@ -232,9 +220,6 @@ test('TC-04 ', async ({ browser }) => {
   expect(hasDrawingA).toBe(true);
 
 });
-
-
-
 
  // TC-05: Drawings are isolated between rooms
 test('TC-05', async ({ browser }) => {
@@ -273,7 +258,7 @@ test('TC-05', async ({ browser }) => {
 
     return false;
   });
-  
+
   // User B should not see User A's stroke
   expect(hasDrawingB).toBe(false);
 
